@@ -2,56 +2,156 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Limit Calculator</title>
+<title>Limit Calculator – Explain Like a Teacher</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-body{margin:0;font-family:Inter,system-ui;background:#f5f7fb}
-.container{max-width:1100px;margin:auto;padding:18px}
-.card{background:#fff;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.06);padding:20px;margin-bottom:20px}
-h1{color:#2563eb;margin:0}
-.subtitle{color:#6b7280;margin-bottom:16px}
-.grid{display:grid;gap:14px}
-.grid-3{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
-input,select,button{padding:12px;border-radius:10px;border:1px solid #e5e7eb;font-size:15px}
-button{background:#2563eb;color:#fff;border:none;font-weight:600;cursor:pointer}
-.reset{background:#eef2ff;color:#1e40af}
-.results{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
-.badge{background:#eef2ff;color:#1e40af;padding:4px 10px;border-radius:999px;font-size:13px;display:inline-block;margin-bottom:6px}
-.warn{background:#fff7ed;color:#92400e;padding:10px;border-radius:10px}
-.code{background:#111827;color:#e5e7eb;padding:10px;border-radius:8px;font-family:monospace}
+:root{
+  --blue:#2563eb;
+  --bg:#f4f6fb;
+  --card:#ffffff;
+  --muted:#6b7280;
+  --radius:14px;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto;
+  background:var(--bg);
+  color:#111827;
+}
+.container{
+  max-width:1100px;
+  margin:auto;
+  padding:16px;
+}
+.card{
+  background:var(--card);
+  border-radius:var(--radius);
+  box-shadow:0 12px 30px rgba(0,0,0,.08);
+  padding:18px;
+  margin-bottom:16px;
+}
+h1{
+  margin:0;
+  color:var(--blue);
+}
+.subtitle{
+  color:var(--muted);
+  margin-top:6px;
+}
+
+label{
+  font-weight:600;
+  font-size:14px;
+}
+input,select{
+  width:100%;
+  padding:12px;
+  margin-top:6px;
+  margin-bottom:14px;
+  border-radius:10px;
+  border:1px solid #d1d5db;
+  font-size:15px;
+}
+
+button{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:12px;
+  background:var(--blue);
+  color:white;
+  font-weight:700;
+  cursor:pointer;
+}
+button.secondary{
+  background:#eef2ff;
+  color:#111;
+  margin-top:10px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+}
+@media(max-width:900px){
+  .grid{grid-template-columns:1fr}
+}
+
+.result-box{
+  background:#f9fafb;
+  border-radius:10px;
+  padding:14px;
+}
+.step{
+  background:#f3f4f6;
+  border-radius:8px;
+  padding:10px;
+  margin-bottom:8px;
+}
+
+.badge{
+  display:inline-block;
+  padding:4px 10px;
+  background:#e0e7ff;
+  color:#1e3a8a;
+  border-radius:999px;
+  font-size:12px;
+  margin-bottom:6px;
+}
+
+.warn{
+  background:#fff4e5;
+  color:#92400e;
+  padding:10px;
+  border-radius:8px;
+  margin-bottom:10px;
+}
+
+.error{
+  color:#dc2626;
+  font-weight:600;
+}
 </style>
 </head>
 
 <body>
 <div class="container">
 
+<!-- INPUT -->
 <div class="card">
 <h1>Limit Calculator</h1>
-<div class="subtitle">Accurate numerical limits • One-sided & two-sided • ∞ supported</div>
+<p class="subtitle">Accurate limits • One-sided & two-sided • ∞ supported • Explain like a teacher</p>
 
-<div class="grid grid-3">
-<input id="fx" placeholder="Function f(x) e.g. Sin(x)/x">
-<input id="point" placeholder="Approaches value (e.g. 0, 5, ∞)">
-<select id="type">
-<option value="both">Two-sided limit</option>
-<option value="left">Left-hand limit</option>
-<option value="right">Right-hand limit</option>
-<option value="inf">Limit at +∞</option>
-<option value="ninf">Limit at −∞</option>
+<label>Function f(x)</label>
+<input id="fx" value="sin(x)/x">
+
+<label>Approaches x →</label>
+<input id="x0" value="0">
+
+<label>Limit Type</label>
+<select id="mode">
+  <option value="two">Two-sided limit</option>
+  <option value="left">Left-hand limit (x → a⁻)</option>
+  <option value="right">Right-hand limit (x → a⁺)</option>
 </select>
+
+<label>
+  <input type="checkbox" id="teach" checked>
+  Explain like a teacher
+</label>
+
+<button onclick="calculate()">Calculate Limit</button>
+<button class="secondary" onclick="resetAll()">Reset</button>
 </div>
 
-<div class="grid" style="margin-top:16px">
-<button onclick="computeLimit()">Calculate Limit</button>
-<button class="reset" onclick="location.reload()">Reset</button>
-</div>
-</div>
-
-<div class="results">
+<!-- OUTPUT -->
+<div class="grid">
 <div class="card">
 <h3>Result</h3>
-<div id="output"></div>
+<div id="result" class="result-box"></div>
 </div>
 
 <div class="card">
@@ -63,74 +163,106 @@ button{background:#2563eb;color:#fff;border:none;font-weight:600;cursor:pointer}
 </div>
 
 <script>
-function normalizeExpression(expr){
+function cleanExpr(expr){
   return expr
-    .toLowerCase()
     .replace(/\^/g,"**")
-    .replace(/pi/g,"Math.PI")
-    .replace(/\be\b/g,"Math.E");
+    .replace(/sin/g,"Math.sin")
+    .replace(/cos/g,"Math.cos")
+    .replace(/tan/g,"Math.tan")
+    .replace(/log/g,"Math.log")
+    .replace(/sqrt/g,"Math.sqrt");
 }
 
-function safeEval(expr,x){
-  const normalized=normalizeExpression(expr);
-  return Function("x","with(Math){return "+normalized+"}")(x);
+function evalAt(expr,x){
+  return Function("x","return "+expr)(x);
 }
 
-function numericLimit(expr,a,dir){
-  let eps=1e-1,prev=null;
-  for(let i=0;i<12;i++){
-    let x=a;
-    if(dir==="left") x=a-eps;
-    if(dir==="right") x=a+eps;
-    if(dir==="both") x=a+eps;
-    let v=safeEval(expr,x);
-    if(!isFinite(v)) return v;
-    if(prev!==null && Math.abs(v-prev)<1e-6) return v;
-    prev=v;
-    eps/=10;
-  }
-  return prev;
-}
+function calculate(){
+  const exprRaw = fx.value.trim();
+  const expr = cleanExpr(exprRaw);
+  const mode = modeSel.value || document.getElementById("mode").value;
+  const teach = document.getElementById("teach").checked;
 
-function computeLimit(){
-  const fx=document.getElementById("fx").value.trim();
-  const p=document.getElementById("point").value.trim();
-  const type=document.getElementById("type").value;
-  const out=document.getElementById("output");
-  const steps=document.getElementById("steps");
-  out.innerHTML="";steps.innerHTML="";
+  let x0raw = document.getElementById("x0").value.trim();
+  let resultBox = document.getElementById("result");
+  let stepsBox = document.getElementById("steps");
 
-  if(!fx||!p){
-    out.innerHTML="<div class='warn'>Enter function and limit point.</div>";
-    return;
-  }
+  resultBox.innerHTML="";
+  stepsBox.innerHTML="";
 
   try{
-    let a;
-    if(p==="∞"||p==="infinity") a=1e6;
-    else if(p==="−∞"||p==="-∞") a=-1e6;
-    else a=parseFloat(p);
+    let x0;
+    if(x0raw==="inf"||x0raw==="∞") x0=Infinity;
+    else if(x0raw==="-inf"||x0raw==="-∞") x0=-Infinity;
+    else x0=Number(x0raw);
 
-    let val;
-    if(type==="inf") val=numericLimit(fx,1e6,"right");
-    else if(type==="ninf") val=numericLimit(fx,-1e6,"left");
-    else val=numericLimit(fx,a,type);
+    const h=1e-6;
+    let left,right,val;
 
-    out.innerHTML=`
-      <div class="badge">Limit</div>
-      <div class="code">${isFinite(val)?val.toFixed(6):"Does not exist"}</div>
+    if(x0===Infinity){
+      val=evalAt(expr,1e6);
+    }
+    else if(x0===-Infinity){
+      val=evalAt(expr,-1e6);
+    }
+    else{
+      left=evalAt(expr,x0-h);
+      right=evalAt(expr,x0+h);
+    }
+
+    if(teach){
+      stepsBox.innerHTML+=`<div class="step">We are evaluating a limit as x approaches ${x0raw}.</div>`;
+    }
+
+    if(mode==="left"){
+      val=left;
+      if(teach){
+        stepsBox.innerHTML+=`<div class="step">Approaching from the left side (x → a⁻).</div>`;
+      }
+    }
+    else if(mode==="right"){
+      val=right;
+      if(teach){
+        stepsBox.innerHTML+=`<div class="step">Approaching from the right side (x → a⁺).</div>`;
+      }
+    }
+    else{
+      if(!isFinite(left)||!isFinite(right)||Math.abs(left-right)>1e-3){
+        resultBox.innerHTML=`<div class="warn">Left and right limits are different or unbounded.</div>`;
+        if(teach){
+          stepsBox.innerHTML+=`<div class="step">Left limit ≠ Right limit → Limit does not exist.</div>`;
+        }
+        return;
+      }
+      val=(left+right)/2;
+      if(teach){
+        stepsBox.innerHTML+=`<div class="step">Both sides approach the same value.</div>`;
+      }
+    }
+
+    resultBox.innerHTML=`
+      <span class="badge">Final Answer</span><br>
+      <strong>Limit = ${val.toFixed(6)}</strong>
     `;
 
-    steps.innerHTML=`
-      <div class="badge">Method</div>
-      <div>Adaptive numerical evaluation</div>
-      <div>Function normalized automatically</div>
-      <div>Convergence tolerance 1×10⁻⁶</div>
-    `;
+    if(teach){
+      stepsBox.innerHTML+=`
+        <div class="step">Therefore, the limit exists and equals ${val.toFixed(6)}.</div>
+      `;
+    }
+
   }catch(e){
-    out.innerHTML="<div class='warn'>Invalid expression or unstable limit.</div>";
+    resultBox.innerHTML=`<span class="error">Invalid expression or undefined limit.</span>`;
   }
 }
+
+function resetAll(){
+  fx.value="sin(x)/x";
+  x0.value="0";
+  document.getElementById("result").innerHTML="";
+  document.getElementById("steps").innerHTML="";
+}
 </script>
+
 </body>
 </html>
