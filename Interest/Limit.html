@@ -6,111 +6,20 @@
 <title>Limit Calculator</title>
 
 <style>
-:root{
-  --blue:#2563eb;
-  --bg:#f5f7fb;
-  --card:#ffffff;
-  --border:#e5e7eb;
-  --text:#111827;
-  --muted:#6b7280;
-  --radius:14px;
-}
-
-body{
-  margin:0;
-  background:var(--bg);
-  font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;
-  color:var(--text);
-}
-
-.container{
-  max-width:1100px;
-  margin:auto;
-  padding:18px;
-}
-
-.card{
-  background:var(--card);
-  border-radius:var(--radius);
-  box-shadow:0 10px 30px rgba(0,0,0,.06);
-  padding:20px;
-  margin-bottom:20px;
-}
-
-h1{
-  color:var(--blue);
-  margin:0 0 6px;
-}
-
-.subtitle{
-  color:var(--muted);
-  margin-bottom:18px;
-}
-
-.grid{
-  display:grid;
-  gap:14px;
-}
-
-.grid-3{
-  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-}
-
-input,select,button{
-  padding:12px 14px;
-  border-radius:10px;
-  border:1px solid var(--border);
-  font-size:15px;
-}
-
-button{
-  background:var(--blue);
-  color:#fff;
-  border:none;
-  font-weight:600;
-  cursor:pointer;
-}
-
-button:hover{opacity:.95}
-
-.reset{
-  background:#eef2ff;
-  color:#1e40af;
-}
-
-.results{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
-  gap:18px;
-}
-
-.badge{
-  display:inline-block;
-  background:#eef2ff;
-  color:#1e40af;
-  padding:4px 10px;
-  border-radius:999px;
-  font-size:13px;
-  margin-bottom:8px;
-}
-
-.warn{
-  background:#fff7ed;
-  color:#92400e;
-  padding:10px;
-  border-radius:10px;
-  margin-bottom:10px;
-}
-
-.code{
-  background:#111827;
-  color:#e5e7eb;
-  padding:10px;
-  border-radius:8px;
-  font-family:monospace;
-  font-size:14px;
-  display:inline-block;
-}
+body{margin:0;font-family:Inter,system-ui;background:#f5f7fb}
+.container{max-width:1100px;margin:auto;padding:18px}
+.card{background:#fff;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.06);padding:20px;margin-bottom:20px}
+h1{color:#2563eb;margin:0}
+.subtitle{color:#6b7280;margin-bottom:16px}
+.grid{display:grid;gap:14px}
+.grid-3{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+input,select,button{padding:12px;border-radius:10px;border:1px solid #e5e7eb;font-size:15px}
+button{background:#2563eb;color:#fff;border:none;font-weight:600;cursor:pointer}
+.reset{background:#eef2ff;color:#1e40af}
+.results{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
+.badge{background:#eef2ff;color:#1e40af;padding:4px 10px;border-radius:999px;font-size:13px;display:inline-block;margin-bottom:6px}
+.warn{background:#fff7ed;color:#92400e;padding:10px;border-radius:10px}
+.code{background:#111827;color:#e5e7eb;padding:10px;border-radius:8px;font-family:monospace}
 </style>
 </head>
 
@@ -118,50 +27,57 @@ button:hover{opacity:.95}
 <div class="container">
 
 <div class="card">
-  <h1>Limit Calculator</h1>
-  <div class="subtitle">
-    Accurate numerical limits • One-sided & two-sided • ∞ supported
-  </div>
+<h1>Limit Calculator</h1>
+<div class="subtitle">Accurate numerical limits • One-sided & two-sided • ∞ supported</div>
 
-  <div class="grid grid-3">
-    <input id="fx" placeholder="Function f(x)  e.g. sin(x)/x">
-    <input id="point" placeholder="Approaches value (a or ∞)">
-    <select id="type">
-      <option value="both">Two-sided limit</option>
-      <option value="left">Left-hand limit (x → a⁻)</option>
-      <option value="right">Right-hand limit (x → a⁺)</option>
-      <option value="inf">Limit at +∞</option>
-      <option value="ninf">Limit at −∞</option>
-    </select>
-  </div>
+<div class="grid grid-3">
+<input id="fx" placeholder="Function f(x) e.g. Sin(x)/x">
+<input id="point" placeholder="Approaches value (e.g. 0, 5, ∞)">
+<select id="type">
+<option value="both">Two-sided limit</option>
+<option value="left">Left-hand limit</option>
+<option value="right">Right-hand limit</option>
+<option value="inf">Limit at +∞</option>
+<option value="ninf">Limit at −∞</option>
+</select>
+</div>
 
-  <div class="grid" style="margin-top:16px">
-    <button onclick="computeLimit()">Calculate Limit</button>
-    <button class="reset" onclick="location.reload()">Reset</button>
-  </div>
+<div class="grid" style="margin-top:16px">
+<button onclick="computeLimit()">Calculate Limit</button>
+<button class="reset" onclick="location.reload()">Reset</button>
+</div>
 </div>
 
 <div class="results">
-  <div class="card">
-    <h3>Result</h3>
-    <div id="output"></div>
-  </div>
+<div class="card">
+<h3>Result</h3>
+<div id="output"></div>
+</div>
 
-  <div class="card">
-    <h3>Step-by-Step</h3>
-    <div id="steps"></div>
-  </div>
+<div class="card">
+<h3>Step-by-Step</h3>
+<div id="steps"></div>
+</div>
 </div>
 
 </div>
 
 <script>
+function normalizeExpression(expr){
+  return expr
+    .toLowerCase()
+    .replace(/\^/g,"**")
+    .replace(/pi/g,"Math.PI")
+    .replace(/\be\b/g,"Math.E");
+}
+
 function safeEval(expr,x){
-  return Function("x","with(Math){return "+expr+"}")(x);
+  const normalized=normalizeExpression(expr);
+  return Function("x","with(Math){return "+normalized+"}")(x);
 }
 
 function numericLimit(expr,a,dir){
-  let eps=1e-1, prev=null;
+  let eps=1e-1,prev=null;
   for(let i=0;i<12;i++){
     let x=a;
     if(dir==="left") x=a-eps;
@@ -182,12 +98,10 @@ function computeLimit(){
   const type=document.getElementById("type").value;
   const out=document.getElementById("output");
   const steps=document.getElementById("steps");
-
-  out.innerHTML="";
-  steps.innerHTML="";
+  out.innerHTML="";steps.innerHTML="";
 
   if(!fx||!p){
-    out.innerHTML="<div class='warn'>Please enter function and limit point.</div>";
+    out.innerHTML="<div class='warn'>Enter function and limit point.</div>";
     return;
   }
 
@@ -202,21 +116,16 @@ function computeLimit(){
     else if(type==="ninf") val=numericLimit(fx,-1e6,"left");
     else val=numericLimit(fx,a,type);
 
-    let text;
-    if(!isFinite(val)) text="Limit diverges (∞ or DNE)";
-    else text=val.toFixed(6);
-
     out.innerHTML=`
       <div class="badge">Limit</div>
-      <div class="code">${text}</div>
+      <div class="code">${isFinite(val)?val.toFixed(6):"Does not exist"}</div>
     `;
 
     steps.innerHTML=`
       <div class="badge">Method</div>
       <div>Adaptive numerical evaluation</div>
-      <div>Step size progressively reduced</div>
-      <div>Convergence tolerance: 1×10⁻⁶</div>
-      <div>Safe Math evaluation</div>
+      <div>Function normalized automatically</div>
+      <div>Convergence tolerance 1×10⁻⁶</div>
     `;
   }catch(e){
     out.innerHTML="<div class='warn'>Invalid expression or unstable limit.</div>";
